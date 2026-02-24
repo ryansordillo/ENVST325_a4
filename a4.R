@@ -118,6 +118,17 @@ ggplot(may_june, aes(x=dateF))+
   theme_classic()
 
 
+#Prompt 3.
+#Check for any date time issues using the function created in the tutorial. Investigate instances of date
+#time issues. What happens around daylight savings? Are there issues with the time zone assumption?
+
+#Looking at output from the function, we can see a few time issues with the data. The first
+#is due to daylight savings time where on March 14 2021, the interval is 75 minutes instead of 
+#15 minutes which is because the clock jumped forward an hour on daylight savings.
+#This comes back into effect in November 2021-11-07 03:30:00 UTC--2021-11-07 02:45:00 UTC,
+# the time goes backwards due to daylight savings and gaining an extra hour.
+#There are also a couple instances of intervals with 0 time as well as some with much larger
+#intervals.
 
 
 
