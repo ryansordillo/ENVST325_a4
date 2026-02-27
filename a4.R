@@ -91,7 +91,7 @@ january <- weather %>%
 rolling_avg <- rep(NA, nrow(january))
 
 for(i in 8:nrow(january)){
-  rolling_avg[i] <- mean(january$AirTemp[(i-7):i], na.rm = TRUE)
+  rolling_avg[i] <- mean(january$AirTemp[(i-7):i])
 }
 
 january$rolling_average <- rolling_avg
@@ -99,7 +99,7 @@ january$rolling_average <- rolling_avg
 #Plot rolling average
 ggplot(january, aes(x=dateF)) +
   geom_line(aes(y=AirTemp), color = "red")+
-  geom_line(aes(y=rolling_average), color="darkblue")+
+  geom_line(aes(y=january$rolling_average), color="darkblue")+
   theme_classic()+
   labs(title = "January 2022 Air Temp with Rolling Average",
        x="Date",
@@ -129,6 +129,65 @@ ggplot(may_june, aes(x=dateF))+
 # the time goes backwards due to daylight savings and gaining an extra hour.
 #There are also a couple instances of intervals with 0 time as well as some with much larger
 #intervals.
+
+
+##Question 1
+"As the weather station data manager, you been asked to share precipitation data with the village of
+Clinton. You want to ensure that there are no issues with the bird excrement or frozen precipitation.
+You want to exclude any precipitation that occurs when the air temperature is below zero. You also
+want to check that no precipitation measurements are used if the X and Y level observations are more
+than 2 degrees.
+Do you think there might be any additional issues with the precipitation data to consider before
+sending the data to the village? Describe what additional data and types of quality control tests (do
+not need to implement) would help you take additional steps to remove problematic precipitation
+data value.
+Indicate how many missing precipitation values are in your data."
+
+sum(is.na(weather$Precip))
+#1158 missing precipitation data values
+
+
+##Question 2
+"Create a data flag that warns a user if the battery voltage falls below 8.5 Volts. Explain how you set up
+the flag."
+
+weather$battery_flag <- ifelse(weather$BatVolt <= 8500, 1, 0)
+
+
+##Question 3
+"You should also create a function that checks for observations that are in unrealistic data ranges in air
+temperature and solar radiation. Explain how your function works and your reasoning."
+
+quality_check <- function(airTemp, SolRad){
+  air_temp_flag <- ifelse(airTemp < -40 | airTemp > 50, 1, 0)
+  sol_rad_flag <- ifelse(SolRad < 0  | SolRad > 1400, 1, 0)
+  return (data.frame(
+    AirTempFlag <- air_temp_flag,
+    SolRadFlag <- sol_rad_flag
+  ))
+}
+
+qc_flags <- quality_check(weather$AirTemp, weather$SolRad)
+
+
+#Question 4.
+"Make a plot of winter air temperatures in Jan - Mar of 2021. Check for persistence issues that might
+indicate snow accumulation on the sensor. Describe whether you think this might be an issue.
+"
+
+winter_2021 <- weather %>%
+  filter(year == 2021 & month(dateF) %in% c(1,2,3))
+
+ggplot(winter_2021, aes(x=dateF, y=AirTemp))+
+  geom_line(color="blue")+
+  theme_classic()+
+  labs(
+    title = "Winter Air Temperature (Jan–Mar 2021)",
+    x = "Date",
+    y = "Air Temperature (°C)"
+  )
+
+
 
 
 
