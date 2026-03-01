@@ -208,15 +208,21 @@ daily <- spring_2021 %>%
 
 daily$precipQC <- daily$daily_precip
 
-for(i in 2:nrow(daily)){
-  if(daily$min_temp[i] < 1.67 |
-     daily$min_temp[i-1] < 1.67){
-    daily$precipQC[i] <- NA
+for(i in 1:nrow(daily)){
+  if(i == 1){
+    if(daily$min_temp[i] < 1.67){
+      daily$precipQC[i] <- NA
+    }
+  } else {
+    if(daily$min_temp[i] < 1.67 | daily$min_temp[i-1] < 1.67){
+      daily$precipQC[i] <- NA
+    }
   }
+  
 }
 
-sum(is.na(daily$precipQC))
-#19
+sum(!is.na(daily$precipQC))
+#18
 
 
 #Question 6
