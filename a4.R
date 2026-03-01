@@ -187,7 +187,68 @@ ggplot(winter_2021, aes(x=dateF, y=AirTemp))+
     y = "Air Temperature (°C)"
   )
 
+##Question 5.
+"You are asked for total daily precipitation in March and April of 2021. 
+Use a for loop to exclude (convert to NA) any days that include temperatures 
+less than 35 degrees F on that day or the day prior to ensure that measurements 
+are not likely to be affected by snow accumulation on the sensor. How many daily 
+observations have precipitation observations (not a NA) in your final data table? "
+
+spring_2021 <- weather %>%
+  filter(year == 2021 & month(dateF) %in% c(3,4))
+
+spring_2021 <- spring_2021 %>%
+  select(dateF, Precip, AirTemp)
+
+daily <- spring_2021 %>%
+  group_by(month(dateF), day(dateF)) %>%
+  summarize(
+    daily_precip = sum(Precip),
+    min_temp = min(AirTemp))
+
+daily$precipQC <- daily$daily_precip
+
+for(i in 2:nrow(daily)){
+  if(daily$min_temp[i] < 1.67 |
+     daily$min_temp[i-1] < 1.67){
+    daily$precipQC[i] <- NA
+  }
+}
+
+sum(is.na(daily$precipQC))
+#19
 
 
+#Question 6
+"Read in the soil temperature data using the for loop. Alter your time interval function to include a user specified time interval (in seconds) as an argument in the 
+function. Check for any clock/time issues associated with the soil data and 
+include the results in your output. Include a brief description of any 
+issues with the clock/data availability. "
+
+soilFiles <- list.files("/cloud/project/activity04/soil")
+# start an empty list
+soilList <- list()
+# start an empty list
+for(i in 1:length(soilFiles)){
+  soilList[[i]] <- read.csv(paste0("/cloud/project/activity04/soil/", soilFiles[i]))
+  
+}
+soilData <- do.call("rbind", soilList)
+soilData$dateF <- ymd_hm(soilData$Timestamp)
+
+timeCheck <- function(x, interval){
+  intervals <- x[-length(x)] %--% x[-1]
+  interval_times <- int_length(intervals)
+  data.frame(
+    start_time = x[-length(x)],
+    end_time = x[-1],
+    interval_sec = interval_times
+  ) %>%
+    filter(interval_sec != interval)
+}
+
+#Checking on 15 minute intervals
+
+soil_time_check <- timeCheck(soilData$dateF,3600)
 
 
